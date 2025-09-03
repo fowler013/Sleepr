@@ -1,0 +1,95 @@
+basePath: /api/v1
+definitions:
+  handlers.ErrorResponse:
+    properties:
+      code:
+        type: string
+      details: {}
+      error:
+        type: string
+    type: object
+  handlers.LoginRequest:
+    properties:
+      sleeper_id:
+        type: string
+      username:
+        type: string
+    required:
+    - sleeper_id
+    - username
+    type: object
+  handlers.LoginResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      display_name:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      sleeper_id:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@sleepr.io
+    name: Sleepr API Support
+    url: http://www.sleepr.io/support
+  description: A comprehensive Fantasy Football management API with advanced analytics
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Sleepr Fantasy Football API
+  version: "1.0"
+paths:
+  /public/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with Sleeper credentials and get JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully authenticated
+          schema:
+            $ref: '#/definitions/handlers.LoginResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: User login
+      tags:
+      - authentication
+securityDefinitions:
+  BearerAuth:
+    description: 'JWT token for API authentication. Format: Bearer {token}'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
