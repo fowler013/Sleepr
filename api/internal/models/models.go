@@ -15,17 +15,17 @@ type User struct {
 
 // Team represents a fantasy football team
 type Team struct {
-	ID          int       `json:"id" db:"id"`
-	UserID      int       `json:"user_id" db:"user_id"`
-	SleeperID   string    `json:"sleeper_id" db:"sleeper_id"`
-	LeagueID    string    `json:"league_id" db:"league_id"`
-	Name        string    `json:"name" db:"name"`
-	Owner       string    `json:"owner" db:"owner"`
-	IsDynasty   bool      `json:"is_dynasty" db:"is_dynasty"`
-	Settings    string    `json:"settings" db:"settings"` // JSON field
-	Roster      string    `json:"roster" db:"roster"`     // JSON field
-	CreatedAt   time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	ID        int       `json:"id" db:"id"`
+	UserID    int       `json:"user_id" db:"user_id"`
+	SleeperID string    `json:"sleeper_id" db:"sleeper_id"`
+	LeagueID  string    `json:"league_id" db:"league_id"`
+	Name      string    `json:"name" db:"name"`
+	Owner     string    `json:"owner" db:"owner"`
+	IsDynasty bool      `json:"is_dynasty" db:"is_dynasty"`
+	Settings  string    `json:"settings" db:"settings"` // JSON field
+	Roster    string    `json:"roster" db:"roster"`     // JSON field
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
 // Player represents a fantasy football player
@@ -62,8 +62,8 @@ type PlayerStats struct {
 // TeamRecommendation represents improvement recommendations for a team
 type TeamRecommendation struct {
 	TeamID      int                    `json:"team_id"`
-	Type        string                 `json:"type"`        // "trade", "waiver", "lineup"
-	Priority    string                 `json:"priority"`    // "high", "medium", "low"
+	Type        string                 `json:"type"`     // "trade", "waiver", "lineup"
+	Priority    string                 `json:"priority"` // "high", "medium", "low"
 	Description string                 `json:"description"`
 	Players     []PlayerRecommendation `json:"players"`
 	Confidence  float64                `json:"confidence"`
@@ -71,21 +71,21 @@ type TeamRecommendation struct {
 
 // PlayerRecommendation represents a player-specific recommendation
 type PlayerRecommendation struct {
-	PlayerID    int     `json:"player_id"`
-	PlayerName  string  `json:"player_name"`
-	Action      string  `json:"action"`      // "add", "drop", "trade", "start", "bench"
-	Reason      string  `json:"reason"`
+	PlayerID     int     `json:"player_id"`
+	PlayerName   string  `json:"player_name"`
+	Action       string  `json:"action"` // "add", "drop", "trade", "start", "bench"
+	Reason       string  `json:"reason"`
 	ProjectedPts float64 `json:"projected_pts"`
 }
 
 // PlayerProjection represents future performance projections
 type PlayerProjection struct {
-	PlayerID      int     `json:"player_id"`
-	PlayerName    string  `json:"player_name"`
-	Week          int     `json:"week"`
-	ProjectedPts  float64 `json:"projected_pts"`
-	Confidence    float64 `json:"confidence"`
-	Ceiling       float64 `json:"ceiling"`
-	Floor         float64 `json:"floor"`
-	Trending      string  `json:"trending"` // "up", "down", "stable"
+	PlayerID     int     `json:"player_id"`
+	PlayerName   string  `json:"player_name"`
+	Week         int     `json:"week"`
+	ProjectedPts float64 `json:"projected_pts"`
+	Confidence   float64 `json:"confidence"`
+	Ceiling      float64 `json:"ceiling"`
+	Floor        float64 `json:"floor"`
+	Trending     string  `json:"trending"` // "up", "down", "stable"
 }

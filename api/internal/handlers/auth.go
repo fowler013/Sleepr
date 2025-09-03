@@ -14,7 +14,7 @@ import (
 
 // LoginRequest represents a login request
 type LoginRequest struct {
-	Username string `json:"username" binding:"required"`
+	Username  string `json:"username" binding:"required"`
 	SleeperID string `json:"sleeper_id" binding:"required"`
 }
 
@@ -41,7 +41,7 @@ func Login(db *sql.DB, cfg *config.Config) gin.HandlerFunc {
 		var req LoginRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Invalid request format",
+				"error":   "Invalid request format",
 				"details": err.Error(),
 			})
 			return
@@ -56,7 +56,7 @@ func Login(db *sql.DB, cfg *config.Config) gin.HandlerFunc {
 				Username:    req.Username,
 				DisplayName: req.Username,
 			}
-			
+
 			if err := userService.Create(user); err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"error": "Failed to create user",

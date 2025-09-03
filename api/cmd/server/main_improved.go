@@ -31,7 +31,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
+func main1() {
 	// Load environment variables
 	if err := godotenv.Load(); err != nil {
 		log.Printf("Warning: .env file not found: %v", err)

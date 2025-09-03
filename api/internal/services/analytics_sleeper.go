@@ -38,7 +38,7 @@ func (s *AnalyticsService) GetTeamRecommendations(teamID int) ([]models.TeamReco
 			Confidence: 0.85,
 		},
 	}
-	
+
 	return recommendations, nil
 }
 
@@ -56,7 +56,7 @@ func (s *AnalyticsService) GetPlayerProjection(playerID int) (*models.PlayerProj
 		Floor:        8.1,
 		Trending:     "up",
 	}
-	
+
 	return projection, nil
 }
 
@@ -80,7 +80,7 @@ func (s *AnalyticsService) GetWaiverWireRecommendations() ([]models.PlayerRecomm
 			ProjectedPts: 8.7,
 		},
 	}
-	
+
 	return recommendations, nil
 }
 

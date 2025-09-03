@@ -26,7 +26,7 @@ func (s *UserService) Create(user *models.User) error {
 	`
 	err := s.db.QueryRow(query, user.SleeperID, user.Username, user.DisplayName, user.Email).
 		Scan(&user.ID, &user.CreatedAt, &user.UpdatedAt)
-	
+
 	return err
 }
 
@@ -37,16 +37,16 @@ func (s *UserService) GetByID(id int) (*models.User, error) {
 		SELECT id, sleeper_id, username, display_name, email, created_at, updated_at
 		FROM users WHERE id = $1
 	`
-	
+
 	err := s.db.QueryRow(query, id).Scan(
 		&user.ID, &user.SleeperID, &user.Username,
 		&user.DisplayName, &user.Email, &user.CreatedAt, &user.UpdatedAt,
 	)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return user, nil
 }
 
@@ -57,16 +57,16 @@ func (s *UserService) GetBySleeperID(sleeperID string) (*models.User, error) {
 		SELECT id, sleeper_id, username, display_name, email, created_at, updated_at
 		FROM users WHERE sleeper_id = $1
 	`
-	
+
 	err := s.db.QueryRow(query, sleeperID).Scan(
 		&user.ID, &user.SleeperID, &user.Username,
 		&user.DisplayName, &user.Email, &user.CreatedAt, &user.UpdatedAt,
 	)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return user, nil
 }
 
@@ -89,13 +89,13 @@ func (s *TeamService) GetAll() ([]models.Team, error) {
 		FROM teams
 		ORDER BY created_at DESC
 	`
-	
+
 	rows, err := s.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	
+
 	for rows.Next() {
 		var team models.Team
 		err := rows.Scan(
@@ -108,7 +108,7 @@ func (s *TeamService) GetAll() ([]models.Team, error) {
 		}
 		teams = append(teams, team)
 	}
-	
+
 	return teams, nil
 }
 
@@ -120,17 +120,17 @@ func (s *TeamService) GetByID(id int) (*models.Team, error) {
 		       settings, roster, created_at, updated_at
 		FROM teams WHERE id = $1
 	`
-	
+
 	err := s.db.QueryRow(query, id).Scan(
 		&team.ID, &team.UserID, &team.SleeperID, &team.LeagueID,
 		&team.Name, &team.Owner, &team.IsDynasty, &team.Settings,
 		&team.Roster, &team.CreatedAt, &team.UpdatedAt,
 	)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return team, nil
 }
 
@@ -162,13 +162,13 @@ func (s *PlayerService) GetAll() ([]models.Player, error) {
 		WHERE is_active = true
 		ORDER BY fantasy_points DESC
 	`
-	
+
 	rows, err := s.db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	
+
 	for rows.Next() {
 		var player models.Player
 		err := rows.Scan(
@@ -181,7 +181,7 @@ func (s *PlayerService) GetAll() ([]models.Player, error) {
 		}
 		players = append(players, player)
 	}
-	
+
 	return players, nil
 }
 
@@ -193,17 +193,17 @@ func (s *PlayerService) GetByID(id int) (*models.Player, error) {
 		       fantasy_points, is_active, created_at, updated_at
 		FROM players WHERE id = $1
 	`
-	
+
 	err := s.db.QueryRow(query, id).Scan(
 		&player.ID, &player.SleeperID, &player.Name, &player.Position,
 		&player.Team, &player.Age, &player.YearsExp, &player.FantasyPoints,
 		&player.IsActive, &player.CreatedAt, &player.UpdatedAt,
 	)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return player, nil
 }
 
@@ -218,13 +218,13 @@ func (s *PlayerService) GetStats(playerID int) ([]models.PlayerStats, error) {
 		WHERE player_id = $1
 		ORDER BY season DESC, week DESC
 	`
-	
+
 	rows, err := s.db.Query(query, playerID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	
+
 	for rows.Next() {
 		var stat models.PlayerStats
 		err := rows.Scan(
@@ -238,6 +238,6 @@ func (s *PlayerService) GetStats(playerID int) ([]models.PlayerStats, error) {
 		}
 		stats = append(stats, stat)
 	}
-	
+
 	return stats, nil
 }

@@ -4,11 +4,11 @@ import "os"
 
 // Config holds all configuration for the application
 type Config struct {
-	DatabaseURL      string
-	SleeperAPIURL    string
-	Port             string
-	Environment      string
-	JWTSecret        string
+	DatabaseURL   string
+	SleeperAPIURL string
+	Port          string
+	Environment   string
+	JWTSecret     string
 }
 
 // Load loads configuration from environment variables
@@ -17,7 +17,7 @@ func Load() *Config {
 	if jwtSecret == "" {
 		panic("JWT_SECRET environment variable is required for security")
 	}
-	
+
 	return &Config{
 		DatabaseURL:   getEnv("DATABASE_URL", "postgresql://localhost/sleepr?sslmode=disable"),
 		SleeperAPIURL: getEnv("SLEEPER_API_BASE_URL", "https://api.sleeper.app/v1"),

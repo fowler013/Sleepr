@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fowler013/sleepr/internal/config"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/fowler013/sleepr/internal/config"
 )
 
 // JWTAuth middleware for JWT token validation
@@ -74,11 +74,11 @@ func RateLimit() gin.HandlerFunc {
 	// Simple in-memory rate limiter (for production, use Redis)
 	clients := make(map[string][]time.Time)
 	limit := 100 // requests per minute
-	
+
 	return gin.HandlerFunc(func(c *gin.Context) {
 		clientIP := c.ClientIP()
 		now := time.Now()
-		
+
 		// Clean old entries
 		if times, exists := clients[clientIP]; exists {
 			var validTimes []time.Time
@@ -89,7 +89,7 @@ func RateLimit() gin.HandlerFunc {
 			}
 			clients[clientIP] = validTimes
 		}
-		
+
 		// Check rate limit
 		if len(clients[clientIP]) >= limit {
 			c.JSON(http.StatusTooManyRequests, gin.H{
@@ -98,7 +98,7 @@ func RateLimit() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		
+
 		// Add current request
 		clients[clientIP] = append(clients[clientIP], now)
 		c.Next()

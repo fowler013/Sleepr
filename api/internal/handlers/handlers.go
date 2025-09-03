@@ -88,10 +88,10 @@ func GetTeam(db *sql.DB) gin.HandlerFunc {
 func SyncTeamFromSleeper(db *sql.DB, cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		teamID := c.Param("id")
-		
+
 		sleeperService := services.NewSleeperService(cfg.SleeperAPIURL)
 		teamService := services.NewTeamService(db)
-		
+
 		if err := teamService.SyncFromSleeper(teamID, sleeperService); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
