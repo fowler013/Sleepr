@@ -14,6 +14,8 @@ vendor/
 *.test
 *.out
 go.work
+sleepr-api
+api/sleepr-api
 
 # Python
 __pycache__/
@@ -99,3 +101,8 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
+
+# Frontend build output
+web/frontend/build/
+web/frontend/dist/
