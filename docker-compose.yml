@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: sleepr
+      POSTGRES_USER: sleepr
+      POSTGRES_PASSWORD: sleepr_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - sleepr-network
+
+  # Go API Service
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://sleepr:sleepr_password@postgres:5432/sleepr?sslmode=disable
+      SLEEPER_API_BASE_URL: https://api.sleeper.app/v1
+      PORT: 8080
+      ANALYTICS_API_URL: http://analytics:8000
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - sleepr-network
+    restart: unless-stopped
+
+  # Python Analytics Service
+  analytics:
+    build:
+      context: ./analytics
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://sleepr:sleepr_password@postgres:5432/sleepr
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    networks:
+      - sleepr-network
+    restart: unless-stopped
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - sleepr-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  sleepr-network:
+    driver: bridge
