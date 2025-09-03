@@ -50,6 +50,26 @@ func (s *UserService) GetByID(id int) (*models.User, error) {
 	return user, nil
 }
 
+// GetBySleeperID retrieves a user by Sleeper ID
+func (s *UserService) GetBySleeperID(sleeperID string) (*models.User, error) {
+	user := &models.User{}
+	query := `
+		SELECT id, sleeper_id, username, display_name, email, created_at, updated_at
+		FROM users WHERE sleeper_id = $1
+	`
+	
+	err := s.db.QueryRow(query, sleeperID).Scan(
+		&user.ID, &user.SleeperID, &user.Username,
+		&user.DisplayName, &user.Email, &user.CreatedAt, &user.UpdatedAt,
+	)
+	
+	if err != nil {
+		return nil, err
+	}
+	
+	return user, nil
+}
+
 // TeamService handles team-related operations
 type TeamService struct {
 	db *sql.DB

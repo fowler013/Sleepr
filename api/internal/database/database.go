@@ -24,6 +24,11 @@ func NewConnection(databaseURL string) (*sql.DB, error) {
 	return db, nil
 }
 
+// Connect is an alias for NewConnection for consistency
+func Connect(databaseURL string) (*sql.DB, error) {
+	return NewConnection(databaseURL)
+}
+
 // RunMigrations runs database migrations
 func RunMigrations(databaseURL string) error {
 	db, err := sql.Open("postgres", databaseURL)

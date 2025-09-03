@@ -8,6 +8,8 @@ import (
 	"github.com/fowler013/sleepr/internal/handlers"
 	"github.com/fowler013/sleepr/internal/middleware"
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
 )
 
 // Server represents the API server
@@ -35,15 +37,39 @@ func (s *Server) setupRoutes() {
 	s.router.Use(middleware.CORS())
 	s.router.Use(middleware.Logger())
 	s.router.Use(middleware.SanitizeInput())
+	s.router.Use(middleware.RateLimit())
 
 	// Health check (no validation needed)
 	s.router.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"version": "1.0.0",
+			"environment": s.config.Environment,
+		})
 	})
 
-	// API routes with ID validation
+	// Swagger documentation
+	s.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// Public API routes (no authentication required)
+	public := s.router.Group("/api/v1/public")
+	public.Use(middleware.ValidateID())
+	
+	// Authentication routes
+	auth := public.Group("/auth")
+	auth.POST("/login", handlers.Login(s.db, s.config))
+	
+	// Public analytics (limited)
+	publicAnalytics := public.Group("/analytics")
+	publicAnalytics.GET("/waiver-wire", handlers.GetWaiverWireRecommendations(s.db))
+
+	// Protected API routes (authentication required)
 	api := s.router.Group("/api/v1")
 	api.Use(middleware.ValidateID())
+	api.Use(middleware.JWTAuth(s.config))
+	
+	// Token refresh endpoint
+	api.POST("/auth/refresh", handlers.RefreshToken(s.config))
 	
 	// User routes
 	users := api.Group("/users")

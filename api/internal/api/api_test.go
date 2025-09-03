@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"testing"
 
 	"github.com/fowler013/sleepr/internal/models"
@@ -53,7 +52,7 @@ func TestPlayerService(t *testing.T) {
 	t.Skip("Database tests require test database setup")
 }
 
-func ExampleSleeprAPI() {
+func Example() {
 	// Example of how to use the API
 	fmt.Println("Sleepr Fantasy Football API")
 	fmt.Println("GET /api/v1/teams - List all teams")
