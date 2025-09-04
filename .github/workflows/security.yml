@@ -1,0 +1,222 @@
+name: Security Scan
+
+on:
+  schedule:
+    # Run security scan daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Dependency Vulnerability Scan
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    # Go security scan
+    - name: Run Go security scan
+      run: |
+        go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
+        cd api
+        gosec -fmt json -out gosec-report.json ./...
+
+    - name: Upload Go security results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: gosec-report.json
+
+    # Python security scan
+    - name: Install Python security tools
+      run: |
+        pip install safety bandit
+
+    - name: Run Python safety check
+      run: |
+        cd analytics
+        safety check --json --output safety-report.json || true
+
+    - name: Run Python bandit scan
+      run: |
+        cd analytics
+        bandit -r . -f json -o bandit-report.json || true
+
+    # Node.js security scan
+    - name: Run npm audit
+      run: |
+        cd web/frontend
+        npm audit --audit-level high --json > npm-audit-report.json || true
+
+    - name: Upload security artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          **/gosec-report.json
+          **/safety-report.json
+          **/bandit-report.json
+          **/npm-audit-report.json
+
+  # Container Security Scan
+  container-scan:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build API Docker image
+      run: |
+        cd api
+        docker build -t sleepr-api:scan .
+
+    - name: Build Analytics Docker image
+      run: |
+        cd analytics
+        docker build -t sleepr-analytics:scan .
+
+    - name: Build Frontend Docker image
+      run: |
+        cd web/frontend
+        docker build -t sleepr-frontend:scan .
+
+    - name: Run Trivy vulnerability scanner on API
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'sleepr-api:scan'
+        format: 'sarif'
+        output: 'trivy-api.sarif'
+
+    - name: Run Trivy vulnerability scanner on Analytics
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'sleepr-analytics:scan'
+        format: 'sarif'
+        output: 'trivy-analytics.sarif'
+
+    - name: Run Trivy vulnerability scanner on Frontend
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'sleepr-frontend:scan'
+        format: 'sarif'
+        output: 'trivy-frontend.sarif'
+
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: |
+          trivy-api.sarif
+          trivy-analytics.sarif
+          trivy-frontend.sarif
+
+  # Static Code Analysis
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'go', 'python', 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
+
+  # License Compliance
+  license-scan:
+    name: License Compliance Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Install go-licenses
+      run: go install github.com/google/go-licenses@latest
+
+    - name: Check Go licenses
+      run: |
+        cd api
+        go-licenses check ./... > go-licenses-report.txt
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install pip-licenses
+      run: pip install pip-licenses
+
+    - name: Check Python licenses
+      run: |
+        cd analytics
+        pip install -r requirements.txt
+        pip-licenses --format=json --output-file=python-licenses-report.json
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install license-checker
+      run: npm install -g license-checker
+
+    - name: Check Node.js licenses
+      run: |
+        cd web/frontend
+        npm ci
+        license-checker --json --out npm-licenses-report.json
+
+    - name: Upload license reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: license-reports
+        path: |
+          **/go-licenses-report.txt
+          **/python-licenses-report.json
+          **/npm-licenses-report.json

@@ -1,0 +1,255 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  GO_VERSION: '1.21'
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Go API Tests
+  test-api:
+    name: Test Go API
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: sleepr_test
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: sleepr_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Install dependencies
+      run: |
+        cd api
+        go mod download
+
+    - name: Run tests
+      env:
+        DATABASE_URL: postgres://sleepr_test:test_password@localhost:5432/sleepr_test?sslmode=disable
+        JWT_SECRET: test-secret-key-for-testing-only
+        SLEEPER_API_URL: https://api.sleeper.app
+      run: |
+        cd api
+        go test -v ./... -coverprofile=coverage.out
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./api/coverage.out
+        flags: api
+        name: api-coverage
+
+  # Python Analytics Tests
+  test-analytics:
+    name: Test Python Analytics
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        cd analytics
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+
+    - name: Run tests
+      run: |
+        cd analytics
+        pytest --cov=api --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./analytics/coverage.xml
+        flags: analytics
+        name: analytics-coverage
+
+  # Frontend Tests
+  test-frontend:
+    name: Test React Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: web/frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd web/frontend
+        npm ci
+
+    - name: Run tests
+      run: |
+        cd web/frontend
+        npm run test -- --coverage --watchAll=false
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./web/frontend/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+  # Lint and Code Quality
+  lint:
+    name: Lint and Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install Go linters
+      run: |
+        go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+    - name: Install Python linters
+      run: |
+        pip install black flake8 mypy
+
+    - name: Install Node dependencies
+      run: |
+        cd web/frontend
+        npm ci
+
+    - name: Lint Go code
+      run: |
+        cd api
+        golangci-lint run
+
+    - name: Lint Python code
+      run: |
+        cd analytics
+        black --check .
+        flake8 .
+
+    - name: Lint TypeScript code
+      run: |
+        cd web/frontend
+        npm run lint
+
+  # Security Scanning
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Build Docker Images
+  build-images:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [test-api, test-analytics, test-frontend, lint]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build API image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./api
+        push: false
+        tags: sleepr-api:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build Analytics image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./analytics
+        push: false
+        tags: sleepr-analytics:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build Frontend image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./web/frontend
+        push: false
+        tags: sleepr-frontend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
