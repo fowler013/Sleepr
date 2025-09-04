@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: sleepr
+data:
+  grafana.ini: |
+    [analytics]
+    check_for_updates = false
+    
+    [log]
+    mode = console
+    level = info
+    
+    [paths]
+    data = /var/lib/grafana
+    logs = /var/log/grafana
+    plugins = /var/lib/grafana/plugins
+    provisioning = /etc/grafana/provisioning
+    
+    [server]
+    http_port = 3000
+    domain = ${GRAFANA_DOMAIN:-localhost}
+    root_url = ${GRAFANA_ROOT_URL:-http://localhost:3000}
+    
+    [security]
+    admin_user = ${GRAFANA_ADMIN_USER:-admin}
+    admin_password = ${GRAFANA_ADMIN_PASSWORD:-admin123}
+    secret_key = ${GRAFANA_SECRET_KEY:-SW2YcwTIb9zpOOhoPsMm}
+    disable_gravatar = true
+    
+    [users]
+    allow_sign_up = false
+    auto_assign_org = true
+    auto_assign_org_role = Viewer
+    
+    [auth]
+    disable_login_form = false
+    
+    [auth.anonymous]
+    enabled = false
+    
+    [smtp]
+    enabled = ${SMTP_ENABLED:-false}
+    host = ${SMTP_HOST:-localhost:587}
+    user = ${SMTP_USER:-}
+    password = ${SMTP_PASSWORD:-}
+    from_address = ${SMTP_FROM:-grafana@sleepr.local}
+    
+    [alerting]
+    enabled = true
+    execute_alerts = true
+    
+    [unified_alerting]
+    enabled = true
+    
+    [feature_toggles]
+    enable = ngalert
+    
+  datasources.yaml: |
+    apiVersion: 1
+    
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://prometheus:9090
+      isDefault: true
+      editable: false
+      jsonData:
+        timeInterval: "15s"
+        queryTimeout: "60s"
+        
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki:3100
+      editable: false
+      
+  dashboards.yaml: |
+    apiVersion: 1
+    
+    providers:
+    - name: 'sleepr-dashboards'
+      orgId: 1
+      folder: 'Sleepr'
+      type: file
+      disableDeletion: false
+      updateIntervalSeconds: 10
+      allowUiUpdates: true
+      options:
+        path: /var/lib/grafana/dashboards

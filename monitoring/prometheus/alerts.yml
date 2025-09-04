@@ -1,0 +1,190 @@
+groups:
+- name: sleepr-api-alerts
+  rules:
+  - alert: APIHighErrorRate
+    expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+    for: 2m
+    labels:
+      severity: critical
+      service: api
+    annotations:
+      summary: "High error rate detected on Sleepr API"
+      description: "API error rate is {{ $value }} errors per second"
+
+  - alert: APIHighLatency
+    expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1.0
+    for: 5m
+    labels:
+      severity: warning
+      service: api
+    annotations:
+      summary: "High latency on Sleepr API"
+      description: "95th percentile latency is {{ $value }}s"
+
+  - alert: APIDown
+    expr: up{job="sleepr-api"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: api
+    annotations:
+      summary: "Sleepr API is down"
+      description: "API has been down for more than 1 minute"
+
+- name: analytics-alerts
+  rules:
+  - alert: AnalyticsAPIDown
+    expr: up{job="analytics-api"} == 0
+    for: 2m
+    labels:
+      severity: critical
+      service: analytics
+    annotations:
+      summary: "Analytics API is down"
+      description: "Analytics API has been down for more than 2 minutes"
+
+  - alert: AnalyticsHighMemoryUsage
+    expr: (process_resident_memory_bytes{job="analytics-api"} / 1024 / 1024 / 1024) > 2
+    for: 5m
+    labels:
+      severity: warning
+      service: analytics
+    annotations:
+      summary: "Analytics API high memory usage"
+      description: "Memory usage is {{ $value }}GB"
+
+  - alert: AnalyticsModelTrainingFailed
+    expr: ml_model_training_failures_total > 0
+    for: 0s
+    labels:
+      severity: warning
+      service: analytics
+    annotations:
+      summary: "ML model training failed"
+      description: "{{ $value }} model training failures detected"
+
+- name: database-alerts
+  rules:
+  - alert: PostgreSQLDown
+    expr: up{job="postgres"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: database
+    annotations:
+      summary: "PostgreSQL is down"
+      description: "PostgreSQL has been down for more than 1 minute"
+
+  - alert: PostgreSQLHighConnections
+    expr: (pg_stat_activity_count / pg_settings_max_connections) > 0.8
+    for: 5m
+    labels:
+      severity: warning
+      service: database
+    annotations:
+      summary: "PostgreSQL high connection usage"
+      description: "Connection usage is {{ $value | humanizePercentage }}"
+
+  - alert: PostgreSQLSlowQueries
+    expr: rate(pg_stat_statements_mean_time_seconds[5m]) > 1.0
+    for: 5m
+    labels:
+      severity: warning
+      service: database
+    annotations:
+      summary: "PostgreSQL slow queries detected"
+      description: "Average query time is {{ $value }}s"
+
+  - alert: PostgreSQLDiskSpaceUsage
+    expr: (pg_database_size_bytes / (1024^3)) > 10
+    for: 5m
+    labels:
+      severity: warning
+      service: database
+    annotations:
+      summary: "PostgreSQL high disk usage"
+      description: "Database size is {{ $value }}GB"
+
+- name: infrastructure-alerts
+  rules:
+  - alert: HighCPUUsage
+    expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 80
+    for: 5m
+    labels:
+      severity: warning
+      service: infrastructure
+    annotations:
+      summary: "High CPU usage"
+      description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+
+  - alert: HighMemoryUsage
+    expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+    for: 5m
+    labels:
+      severity: warning
+      service: infrastructure
+    annotations:
+      summary: "High memory usage"
+      description: "Memory usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+
+  - alert: DiskSpaceUsage
+    expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes > 0.9
+    for: 5m
+    labels:
+      severity: critical
+      service: infrastructure
+    annotations:
+      summary: "High disk usage"
+      description: "Disk usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+
+  - alert: RedisDown
+    expr: up{job="redis"} == 0
+    for: 1m
+    labels:
+      severity: warning
+      service: cache
+    annotations:
+      summary: "Redis is down"
+      description: "Redis has been down for more than 1 minute"
+
+- name: business-alerts
+  rules:
+  - alert: LowUserActivity
+    expr: rate(user_logins_total[1h]) < 0.1
+    for: 30m
+    labels:
+      severity: info
+      service: business
+    annotations:
+      summary: "Low user activity detected"
+      description: "User login rate is {{ $value }} per hour"
+
+  - alert: HighSleeperAPIErrors
+    expr: rate(sleeper_api_errors_total[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: warning
+      service: external
+    annotations:
+      summary: "High Sleeper API error rate"
+      description: "Sleeper API error rate is {{ $value }} errors per second"
+
+  - alert: AnalyticsJobsStuck
+    expr: analytics_pending_jobs > 100
+    for: 10m
+    labels:
+      severity: warning
+      service: analytics
+    annotations:
+      summary: "Analytics jobs are accumulating"
+      description: "{{ $value }} pending analytics jobs"
+
+  - alert: DataQualityIssues
+    expr: data_quality_score < 0.8
+    for: 5m
+    labels:
+      severity: warning
+      service: data
+    annotations:
+      summary: "Data quality issues detected"
+      description: "Data quality score is {{ $value }}"
