@@ -1,0 +1,228 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Business Metrics & User Analytics",
+    "tags": ["sleepr", "business", "users", "fantasy"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Active Users",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "active_users_total",
+            "legendFormat": "Total Active Users"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Daily Logins",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "increase(user_logins_total[24h])",
+            "legendFormat": "Daily Logins"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Teams Analyzed",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "teams_analyzed_total",
+            "legendFormat": "Teams Analyzed"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Dynasty Reports Generated",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(dynasty_reports_generated_total[24h]) * 24 * 3600",
+            "legendFormat": "Daily Reports"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "User Engagement Over Time",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(user_logins_total[1h]) * 3600",
+            "legendFormat": "Logins per Hour"
+          },
+          {
+            "expr": "rate(page_views_total[1h]) * 3600",
+            "legendFormat": "Page Views per Hour"
+          },
+          {
+            "expr": "rate(api_requests_total{endpoint=\"/teams\"}[1h]) * 3600",
+            "legendFormat": "Team Views per Hour"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Fantasy Performance Insights",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg(team_performance_score)",
+            "legendFormat": "Average Team Score"
+          },
+          {
+            "expr": "rate(waiver_transactions_total[1h]) * 3600",
+            "legendFormat": "Waiver Activity per Hour"
+          },
+          {
+            "expr": "rate(trade_analysis_requests_total[1h]) * 3600",
+            "legendFormat": "Trade Analysis per Hour"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 7,
+        "title": "League Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (league_type) (leagues_connected_total)",
+            "legendFormat": "{{league_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 16}
+      },
+      {
+        "id": 8,
+        "title": "Top Performing Features",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "sum by (feature) (rate(feature_usage_total[24h]) * 24 * 3600)",
+            "legendFormat": "{{feature}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 16}
+      },
+      {
+        "id": 9,
+        "title": "User Satisfaction Metrics",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(user_satisfaction_score)",
+            "legendFormat": "Avg Satisfaction"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [],
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 3.5},
+                {"color": "green", "value": 4.0}
+              ]
+            },
+            "unit": "short",
+            "min": 1,
+            "max": 5
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 16}
+      },
+      {
+        "id": 10,
+        "title": "Recent Dynasty Recommendations",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "dynasty_recommendations",
+            "legendFormat": "Dynasty Recommendations",
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24}
+      }
+    ],
+    "time": {"from": "now-24h", "to": "now"},
+    "timepicker": {
+      "refresh_intervals": ["1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+    },
+    "refresh": "5m"
+  }
+}
