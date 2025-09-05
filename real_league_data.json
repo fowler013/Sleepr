@@ -1,0 +1,232 @@
+[
+  {
+    "league_id": "1197641763607556096",
+    "league_name": "A League Far Far Away",
+    "season": "2025",
+    "teams": [
+      {
+        "roster_id": 1,
+        "team_name": "Foxtrot",
+        "owner_name": "Nivet",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 2,
+        "team_name": "Lights, Camera, JACKSON\ud83d\udd25",
+        "owner_name": "mjwuAU",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 3,
+        "team_name": "Stone and Sky",
+        "owner_name": "OldManLoganX",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 4,
+        "team_name": "Jordan\u2019s Love stuff",
+        "owner_name": "blazers07",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 5,
+        "team_name": "Josh the tip",
+        "owner_name": "bowick13",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 6,
+        "team_name": "Allen and Associates ",
+        "owner_name": "cdnoles",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 7,
+        "team_name": "Wallliie",
+        "owner_name": "Wallliie",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 8,
+        "team_name": "CDL Drizzy",
+        "owner_name": "jhud12",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 9,
+        "team_name": "CokerCola",
+        "owner_name": "CokerCola",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 10,
+        "team_name": "elalande",
+        "owner_name": "elalande",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 11,
+        "team_name": "icavanah",
+        "owner_name": "icavanah",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 12,
+        "team_name": "Show Me Those TDs",
+        "owner_name": "fowlmouthlass",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      }
+    ]
+  },
+  {
+    "league_id": "1180092430900092928",
+    "league_name": "Stumblin', Bumblin', and Fumblin'",
+    "season": "2025",
+    "teams": [
+      {
+        "roster_id": 1,
+        "team_name": "Cheese Traviolis",
+        "owner_name": "mjwuAU",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 2,
+        "team_name": "House Fowler",
+        "owner_name": "Nivet",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 3,
+        "team_name": "Tyreek and Destroy! ",
+        "owner_name": "tschaef2",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 4,
+        "team_name": "Revenge Tour",
+        "owner_name": "blazingmelon",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 5,
+        "team_name": "Cheese Kingdom",
+        "owner_name": "jmeeder",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 6,
+        "team_name": "Barenaked Bootleggers",
+        "owner_name": "OldManLoganX",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 7,
+        "team_name": "Allien Invasion",
+        "owner_name": "Shadow11",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 8,
+        "team_name": "2024 loser",
+        "owner_name": "dave6745",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 9,
+        "team_name": "JGrif RTR",
+        "owner_name": "RMFTOTA",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 10,
+        "team_name": "Jeremy\u2019s Bitch",
+        "owner_name": "charlesflowers",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 11,
+        "team_name": "Cobra0642",
+        "owner_name": "Cobra0642",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      },
+      {
+        "roster_id": 12,
+        "team_name": "Average Joe\u2019s",
+        "owner_name": "jtholcombe96",
+        "username": "unknown",
+        "wins": 0,
+        "losses": 0,
+        "points": 0
+      }
+    ]
+  }
+]
